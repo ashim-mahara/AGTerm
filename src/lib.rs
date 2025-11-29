@@ -11,7 +11,7 @@ use std::sync::mpsc::{channel, Receiver, Sender};
 use std::{thread, time, sync::Mutex};
 
 #[pyclass]
-struct TerminalEnv {
+struct AGTerm {
     process: PtyProcess,
     // buffer_write_channel: Sender<String>,
     buffer_read_channel: Mutex<Receiver<String>>,
@@ -26,7 +26,7 @@ struct TerminalEnv {
 
 
 #[pymethods]
-impl TerminalEnv {
+impl AGTerm {
     #[new]
     fn new(command: String, interactive: bool) -> PyResult<Self> {
         let os_command = Command::new(command.clone());
@@ -50,7 +50,7 @@ impl TerminalEnv {
         // let buffer_write_channel = sender_channel.clone();
         let buffer_read_channel = Mutex::new(receiver_channel);
 
-        Ok(TerminalEnv {
+        Ok(AGTerm {
             process,
             // buffer_write_channel,
             buffer_read_channel,
@@ -86,7 +86,7 @@ impl TerminalEnv {
 
     pub fn reset(&mut self) {
         self.close().unwrap();
-        *self = TerminalEnv::new(self.command.clone(), self.interactive).unwrap();
+        *self = AGTerm::new(self.command.clone(), self.interactive).unwrap();
         let initial_state = self.read_from_stream().unwrap();
         println!("Initial State: {}", initial_state);
     }
@@ -297,7 +297,7 @@ pub fn read_from_channel(read_channel: Receiver<String>, timeout: i32) -> Result
 /// A Python module implemented in Rust.
 #[pymodule(gil_used = false)]
 
-fn terminal_env(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<TerminalEnv>()?;
+fn ag_term(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<AGTerm>()?;
     Ok(())
 }
