@@ -572,7 +572,7 @@ fn sanitize_for_agent(bytes: &[u8]) -> String {
     String::from_utf8_lossy(&out).to_string()
 }
 
-#[pymodule(gil_used = false)]
+#[pymodule(name="agterm", gil_used = false)]
 fn ag_term(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<AGTerm>()?;
     Ok(())
